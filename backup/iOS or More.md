@@ -1,4 +1,4 @@
 Hello, world!
 I'm working with SwiftUI, the new UI framework which can really apply in production after WWDC23. This Blog will talk more SwiftUI, because traditional UIKit will be out of style gradually, and there are so much old good resources about UIKit and StoryBoard.
-However, there are a little bits 👌🏻🌌 problems behind SwiftUI, such as struct huge-memory-usage view (multi-media)'s performance and GC, architectural pattern debate of M-V vs M-V-VM in project, chaotic Repositories with Super Coordinator or View Model or MORE.
+However, there are a little bits 👌🏻🌌 problems behind SwiftUI, such as `struct huge-memory-usage view (multi-media)'s performance and GC`, `architectural pattern debate of M-V vs M-V-VM in project`, `chaotic Repositories with Super Coordinator or View Model` or MORE.
 Those themes will be a tint color, exist in articles, refered by a lot of channel. 刘安 said, "Rivers converge from different sources, then they all return to the ocean."
