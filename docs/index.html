@@ -105,10 +105,14 @@ if("06/17/2024"!=""){
     var diff=now.getTime()-startSite.getTime();
     var diffDay=Math.floor(diff/(1000*60*60*24));
     document.getElementById("year").innerHTML=now.getFullYear();
-    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
-    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+    if (""!="") {
+        document.getElementById("runday").innerHTML=" • "+"site has run"+diffDay+"day"+" • ";
+    } else {
+        document.getElementById("runday").innerHTML="site has run"+diffDay+"day"+" • ";
+    }
 }
 </script>
+        <span id="busuanzi_container_site_pv"><span id="busuanzi_value_site_pv"></span>times</span>
 </div>
 </body>
 <script>
