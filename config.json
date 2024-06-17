@@ -12,7 +12,7 @@
     "nightTheme":"dark_colorblind",
     "urlMode":"pinyin",
     "style":"",
-    "script":"",
+    "script":"<script async src='//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'></script>",
     "indexStyle":"",
     "indexScript":"",
     "showPostSource":1,
