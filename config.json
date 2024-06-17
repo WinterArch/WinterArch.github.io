@@ -1,6 +1,20 @@
 {
-    "title":"Blog Title",
-    "subTitle":"Blog description",
+    "title":"iOS or More",
+    "subTitle":"Web-Communists communicate in webs.",
     "avatarUrl":"https://github.githubassets.com/favicons/favicon.svg",
-    "GMEEK_VERSION":"last"
+    "GMEEK_VERSION":"last",
+    "homeUrl":"http://blog.meekdai.com",
+    "onePageListNum":15,
+    "UTC":8,
+    "themeMode":"manual",
+    "dayTheme":"light",
+    "nightTheme":"dark_colorblind",
+    "urlMode":"pinyin",
+    "style":"",
+    "script":"",
+    "indexStyle":"",
+    "indexScript":"",
+    "showPostSource":1,
+    "rssSplit":"sentence",
+    "bottomText":"转载请注明出处"
 }
