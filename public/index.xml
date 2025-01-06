@@ -2,11 +2,25 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>WinerArch`s Blog</title>
-    <link>https://winerarch.github.io/</link>
+    <link>http://localhost:1313/</link>
     <description>Recent content on WinerArch`s Blog</description>
     <generator>Hugo -- 0.140.2</generator>
     <language>en-us</language>
-    <lastBuildDate></lastBuildDate>
-    <atom:link href="https://winerarch.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 07 Jan 2025 05:03:36 +0800</lastBuildDate>
+    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>AddContent</title>
+      <link>http://localhost:1313/posts/addcontent/</link>
+      <pubDate>Tue, 07 Jan 2025 05:03:36 +0800</pubDate>
+      <guid>http://localhost:1313/posts/addcontent/</guid>
+      <description>&lt;p&gt;添加内容&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Quickstart</title>
+      <link>http://localhost:1313/posts/quickstart/</link>
+      <pubDate>Mon, 06 Jan 2025 07:16:40 +0800</pubDate>
+      <guid>http://localhost:1313/posts/quickstart/</guid>
+      <description>&lt;p&gt;###你好, 世界!&lt;/p&gt;</description>
+    </item>
   </channel>
 </rss>
