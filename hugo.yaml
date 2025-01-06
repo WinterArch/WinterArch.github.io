@@ -1,7 +1,7 @@
-baseURL: https://winerarch.github.io
+baseURL: https://winterarch.github.io
 languageCode: en-us
 defaultContentLanguage: zh
-title: WinerArch`s Blog
+title: WinterArch`s Blog
 theme: PaperMod
 
 params:
@@ -11,12 +11,12 @@ params:
   # 评论系统
   comments: true
   commentsParams:
-    repo: jaredyam/jaredyam.github.io
-    repoId: R_kgDOG9Gq_Q
-    category: Announcements
-    categoryId: DIC_kwDOG9Gq_c4CO_p0
-    mapping: title
+    repo: WinterArch/WinterArch.github.io
+    repoId: R_kgDONmR4Mg
+    category: General
+    categoryId: DIC_kwDONmR4Ms4Clvqf
+    mapping: pathname
     reactionsEnabled: 1
-    emitMetadata: 1
-    inputPosition: top
+    emitMetadata: 0
+    inputPosition: bottom
     lang: zh-CN
