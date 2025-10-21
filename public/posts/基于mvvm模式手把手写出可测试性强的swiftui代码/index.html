@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>基于MVVM模式手把手写出可测试性强的SwiftUI代码 | WinterArch&#39;s WebLog</title>
+<meta name="keywords" content="">
+<meta name="description" content="用SwiftUI框架绘制视图
+首先在Xcode里新建一个Swift Package包，要写UI库选择Library，git版本管理可以不勾，带SwiftTesting确保在Swift6的较新环境。
+项目结构：
+ImmutableState
+├── Package.swift
+├── Sources
+│   └── ImmutableState
+│       └── ImmutableState.swift
+└── Tests
+    └── ImmutableStateTests
+        └── ImmutableStateTests.swift
+Package.swift（模板生成）：
+let package = Package(
+    name: &#34;ImmutableState&#34;,
+    products: [
+        // Products define the executables and libraries a package produces, making them visible to other packages.
+        .library(
+            name: &#34;ImmutableState&#34;,
+            targets: [&#34;ImmutableState&#34;]),
+    ],
+    targets: [
+        // Targets are the basic building blocks of a package, defining a module or a test suite.
+        // Targets can depend on other targets in this package and products from dependencies.
+        .target(
+            name: &#34;ImmutableState&#34;),
+        .testTarget(
+            name: &#34;ImmutableStateTests&#34;,
+            dependencies: [&#34;ImmutableState&#34;]
+        ),
+    ]
+)
+上方展示了创建时的工程结构和模板生成Package.swift。
+其次在ImmutableState.swift 旁边创建 ImmutableDemo 文件夹安放接下来的整套代码，也就在ImmutableDemo文件夹下使用 SwiftUIView 模板创建代码，然后右键struct的名称，refactor重构rename改名为 ImmutableView。">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/%E5%9F%BA%E4%BA%8Emvvm%E6%A8%A1%E5%BC%8F%E6%89%8B%E6%8A%8A%E6%89%8B%E5%86%99%E5%87%BA%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%80%A7%E5%BC%BA%E7%9A%84swiftui%E4%BB%A3%E7%A0%81/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a090830a421002426baafbd314e38f149d77b4c48a12ee9312700d770b27fb26.css" integrity="sha256-oJCDCkIQAkJrqvvTFOOPFJ13tMSKEu6TEnANdwsn&#43;yY=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/%E5%9F%BA%E4%BA%8Emvvm%E6%A8%A1%E5%BC%8F%E6%89%8B%E6%8A%8A%E6%89%8B%E5%86%99%E5%87%BA%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%80%A7%E5%BC%BA%E7%9A%84swiftui%E4%BB%A3%E7%A0%81/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="WinterArch&#39;s WebLog (Alt + H)">WinterArch&#39;s WebLog</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      基于MVVM模式手把手写出可测试性强的SwiftUI代码
+      <span class="entry-hint" title="Draft">
+        <svg xmlns="http://www.w3.org/2000/svg" height="35" viewBox="0 -960 960 960" fill="currentColor">
+          <path
+            d="M160-410v-60h300v60H160Zm0-165v-60h470v60H160Zm0-165v-60h470v60H160Zm360 580v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T862.09-380L643-160H520Zm300-263-37-37 37 37ZM580-220h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z" />
+        </svg>
+      </span>
+    </h1>
+    <div class="post-meta"><span title='2025-10-21 15:43:57 +0800 CST'>October 21, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><h1 id="用swiftui框架绘制视图">用SwiftUI框架绘制视图<a hidden class="anchor" aria-hidden="true" href="#用swiftui框架绘制视图">#</a></h1>
+<p>首先在Xcode里新建一个Swift Package包，要写UI库选择Library，git版本管理可以不勾，带SwiftTesting确保在Swift6的较新环境。
+项目结构：</p>
+<pre tabindex="0"><code>ImmutableState
+├── Package.swift
+├── Sources
+│   └── ImmutableState
+│       └── ImmutableState.swift
+└── Tests
+    └── ImmutableStateTests
+        └── ImmutableStateTests.swift
+</code></pre><p>Package.swift（模板生成）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">let</span> package = Package(
+</span></span><span style="display:flex;"><span>    name: <span style="color:#e6db74">&#34;ImmutableState&#34;</span>,
+</span></span><span style="display:flex;"><span>    products: [
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Products define the executables and libraries a package produces, making them visible to other packages.</span>
+</span></span><span style="display:flex;"><span>        .library(
+</span></span><span style="display:flex;"><span>            name: <span style="color:#e6db74">&#34;ImmutableState&#34;</span>,
+</span></span><span style="display:flex;"><span>            targets: [<span style="color:#e6db74">&#34;ImmutableState&#34;</span>]),
+</span></span><span style="display:flex;"><span>    ],
+</span></span><span style="display:flex;"><span>    targets: [
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Targets are the basic building blocks of a package, defining a module or a test suite.</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Targets can depend on other targets in this package and products from dependencies.</span>
+</span></span><span style="display:flex;"><span>        .target(
+</span></span><span style="display:flex;"><span>            name: <span style="color:#e6db74">&#34;ImmutableState&#34;</span>),
+</span></span><span style="display:flex;"><span>        .testTarget(
+</span></span><span style="display:flex;"><span>            name: <span style="color:#e6db74">&#34;ImmutableStateTests&#34;</span>,
+</span></span><span style="display:flex;"><span>            dependencies: [<span style="color:#e6db74">&#34;ImmutableState&#34;</span>]
+</span></span><span style="display:flex;"><span>        ),
+</span></span><span style="display:flex;"><span>    ]
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>上方展示了创建时的工程结构和模板生成Package.swift。
+其次在ImmutableState.swift 旁边创建 ImmutableDemo 文件夹安放接下来的整套代码，也就在ImmutableDemo文件夹下使用 SwiftUIView 模板创建代码，然后右键struct的名称，refactor重构rename改名为 ImmutableView。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">import</span> <span style="color:#a6e22e">SwiftUI</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        Text(<span style="color:#e6db74">&#34;Hello, World!&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>#Preview {
+</span></span><span style="display:flex;"><span>    ImmutableView()
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>此时报错提到“&lsquo;View&rsquo; is only available in iOS 13.0 or newer”等字样，说明库包模板生成的初始代码有可能和SwiftUI所要求的不符，来想办法修复它。
+不了解Package.swift的朋友可能想问类似“如何在Swift Package中支持iOS等问题”。
+最后通过阅读各种形式的文档搞清楚Package.swift的配置格式后，了解到解决办法是在name和products之间增加一行配置：
+<code>platforms: [.iOS(.v13)],</code>
+这个字段指定整个包支持的版本，代码中指定了iOS13，以后根据报错要求，不妨逐渐提升。
+ImmutableView.swift标签页右方尽头，在倒数第2个按钮的多条横线样式的按钮上单击，在弹出的菜单里把Canvas预览画板点上刷新，已经可以看到第一行SwiftUI代码了。
+这些UI代码写到库包里，不仅可以把工程结构和依赖关系撘得更清晰，还可以在换地方搬砖时复用（小心违法）。</p>
+<h1 id="swiftui绘制原理">SwiftUI绘制原理<a hidden class="anchor" aria-hidden="true" href="#swiftui绘制原理">#</a></h1>
+<p>所有人都在让SwiftUI新手写下第一个<code>@State</code>属性：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    @State <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        Button(action: {
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>        }, label: {
+</span></span><span style="display:flex;"><span>            Text(<span style="color:#e6db74">&#34;Hello, World!</span><span style="color:#e6db74">\(</span>counter<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>counter代表计数器。
+预览画板中将会出现蓝色样式的按钮，按时是灰色。鼠标放到<code>@State</code>上按Option键单击，查看快速帮助（也可以在右上角打开右侧边栏点问号那个按钮，或把光标移动到位之后按下Ctrl+Command+?）。
+学过Swift的朋友一定知道属性包装器和协议，这种@xx字样的不是attribute特性，就是属性包装器。还是鼠标放到<code>@State</code>上按 Command 键单击，进去看看，果然有@propertyWrapper，还发现它是遵循了<code>DynamicProperty</code>协议，再点进这个协议，可以看到它要求名为update的可变异方法。
+这个方法会在<code>@State</code>包装的属性发生变化时，要求<code>View</code>重新绘制。
+有人说Swift语言为编程引入了一种面向协议的范式。
+同样的道理，出来到 ImmutableView.swift 标签页，点击 ImmutableView: View 的<code>View</code>进去看看，可以看到<code>View</code>也是协议，要求实现body属性，且需要是另一个遵循View协议的类型。
+甚至能以一种不推荐的方式改写而不报错：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span> {
+</span></span><span style="display:flex;"><span>    @State <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">extension</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        Button(action: {
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>        }, label: {
+</span></span><span style="display:flex;"><span>            Text(<span style="color:#e6db74">&#34;Hello, World!</span><span style="color:#e6db74">\(</span>counter<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这只是展示，还是Command+Z撤销还原回去。为了让counter计数器生效，可以在action闭包中间写入
+<code>counter = counter + 1</code>
+这行代码给counter赋值为比原值大1的值。
+把预览画板作为UI测试器，点击按钮，计数器的结果已经如预期增加了。
+再写一个一次增加5点计数的按钮：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    @State <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        VStack {
+</span></span><span style="display:flex;"><span>            Text(<span style="color:#e6db74">&#34;counter: </span><span style="color:#e6db74">\(</span>counter<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            Button(action: {
+</span></span><span style="display:flex;"><span>                counter = counter <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            }, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+1!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>            Button(action: {
+</span></span><span style="display:flex;"><span>                counter = counter <span style="color:#f92672">+</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span>            }, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+5!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>可以发现写了很多相似的逻辑代码，而且分散在视图之间，编程里的重复总是不太好，可以这么写：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    @State <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        VStack {
+</span></span><span style="display:flex;"><span>            Text(<span style="color:#e6db74">&#34;counter: </span><span style="color:#e6db74">\(</span>counter<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            Button(action: tapButtonPlus1, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+1!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>            Button(action: tapButtonPlus5, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+5!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tapButtonPlus1</span>() {
+</span></span><span style="display:flex;"><span>        plus(with: <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tapButtonPlus5</span>() {
+</span></span><span style="display:flex;"><span>        plus(with: <span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">plus</span>(with number: Int) {
+</span></span><span style="display:flex;"><span>        counter = counter <span style="color:#f92672">+</span> number
+</span></span><span style="display:flex;"><span>        print(counter)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这次改动把按钮们的action放到方法内，集中在同一块区域写出，并且把相似的逻辑整合到一个方法里。
+可以想象到随着视图逐渐变大，在涉及执行未必成功的代码时，还要写相应的异常处理、界面提示，方法区会随着这些的增长大到一定地步。
+下面的测试写在/Tests/ImmutableStateTests/ImmutableStateTests.swift中，分别+1和+5之后，counter不等于预期的结果6：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span>@MainActor <span style="color:#75715e">// ImmutableView要求@MainActor或async/await，这行把测试方法放在主线程的行为体中运行，避免引入await</span>
+</span></span><span style="display:flex;"><span>@Test <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">example</span>() async <span style="color:#66d9ef">throws</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> view = ImmutableView()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    view.tapButtonPlus1()
+</span></span><span style="display:flex;"><span>    view.tapButtonPlus5()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    assert(view.counter == <span style="color:#ae81ff">6</span>) <span style="color:#75715e">// Thread 1: Assertion failed</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>没有人乐意每次都手动点开一个路由很深的页面，甚至维护在XCTest中录下自动打开的过程也会在工程长大之后变得繁琐。
+我们需要另外一个语义来让视图与逻辑清晰地区分开，尤其要便于测试。</p>
+<h1 id="m-v-vm模式">M-V-VM模式<a hidden class="anchor" aria-hidden="true" href="#m-v-vm模式">#</a></h1>
+<p>SwiftUI原生的模式是M-V模式，这种模式把逻辑集成在视图里，数据流向是Model &lt;-&gt; View，测试起来不太方便，极其依赖预览画板的展示，好处是在写一些小视图时表达性很强。
+本文推荐的模式是通过苹果官方支持的Combine响应式框架实现的M-V-VM模式，这种模式把状态和逻辑摘到类中，可以写出不用预览画板就能在单元测试中使用的代码，视图规模但凡稍微上去一点就建议这么写，数据流向是Model &lt;-&gt; ViewModel &lt;-&gt; View。
+其中，Model表示结构与逻辑，View表示视图与动作源，ViewModel表示动作与响应源。
+工程中只有合适与不合适之分，没有绝对的好坏。
+从<code>import SwiftUI</code>点进去，可以看到SwiftUI自身也有<code>import Combine</code>，它背后做了一些事，因此有SwiftUI的地方绝大部分时候不需要导入Combine。</p>
+<h1 id="用combine框架发布视图状态更新">用Combine框架发布视图状态更新<a hidden class="anchor" aria-hidden="true" href="#用combine框架发布视图状态更新">#</a></h1>
+<p>简单介绍一下要用到的Combine框架的属性包装器。
+<code>@Published</code>可以理解为是在可观察类中的<code>@State</code>。
+<code>ObservableObject</code>可观察类是一个能在观察到<code>@Published</code>成员属性的值发生变化时发出通知的类协议。
+<code>@StateObject</code>是供可观察类使用的属性包装器，接到存放的可观察类的变化通知时会调用update方法使<code>View</code>更新。@StateObject要求iOS14。
+试试把counter和那些方法搬到新的可观察类ImmutableViewModel里，然后用<code>@StateObject</code>存放类实例viewModel：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">ImmutableView</span>: View {
+</span></span><span style="display:flex;"><span>    @StateObject <span style="color:#66d9ef">var</span> viewModel = ImmutableViewModel()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">var</span> body: some View {
+</span></span><span style="display:flex;"><span>        VStack {
+</span></span><span style="display:flex;"><span>            Text(<span style="color:#e6db74">&#34;counter: </span><span style="color:#e6db74">\(</span>viewModel.counter<span style="color:#e6db74">)</span><span style="color:#e6db74">&#34;</span>)
+</span></span><span style="display:flex;"><span>            Button(action: viewModel.tapButtonPlus1, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+1!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>            Button(action: viewModel.tapButtonPlus5, label: {
+</span></span><span style="display:flex;"><span>                Text(<span style="color:#e6db74">&#34;+5!&#34;</span>)
+</span></span><span style="display:flex;"><span>            })
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">ImmutableViewModel</span>: ObservableObject {
+</span></span><span style="display:flex;"><span>    @Published <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tapButtonPlus1</span>() {
+</span></span><span style="display:flex;"><span>        plus(with: <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">tapButtonPlus5</span>() {
+</span></span><span style="display:flex;"><span>        plus(with: <span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">plus</span>(with number: Int) {
+</span></span><span style="display:flex;"><span>        counter = counter <span style="color:#f92672">+</span> number
+</span></span><span style="display:flex;"><span>        print(counter)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这些属性包装器在类型中增加了以下划线为前缀加上原名的属性，在需要手写初始化代码时可以在初始化器中显式赋值。
+有发出通知的可观察类<code>ObservableObject</code>，<code>View</code>中就要有存放实例并接收通知的属性包装器<code>@StateObject</code>。
+顺便一提，enum枚举体虽然可以实现<code>View</code>协议，但是不能含有如@StateObject属性、@State属性等作为视图状态变量存放的存储属性。以enum为载体的<code>View</code>讲好听点叫纯函数式，作为单状态视图是可行的，不过它更适合当Model。
+好，可以到ImmutableStateTests.swift中测试了：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#75715e">// 这行不需要@MainActor，是因为没有@StateObject等属性包装器要求</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 生产代码中，ViewModel自身和面向View层的成员应当尽量被@MainActor修饰</span>
+</span></span><span style="display:flex;"><span>@Test <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">example</span>() async <span style="color:#66d9ef">throws</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">let</span> viewModel = ImmutableViewModel()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    viewModel.tapButtonPlus1()
+</span></span><span style="display:flex;"><span>    viewModel.tapButtonPlus5()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    assert(viewModel.counter == <span style="color:#ae81ff">6</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>分别输出1和6并且测试通过。
+这看似很简单的测试，原先M-V代码来是无法运行通过的。</p>
+<h1 id="对外不可变的封装">对外不可变的封装<a hidden class="anchor" aria-hidden="true" href="#对外不可变的封装">#</a></h1>
+<p>有一个很自然而然的想法：既然已经把代码写在ViewModel中了，就不太希望成员被外部的View层修改。当然如TextFeild等双向绑定时依旧要能修改，不过对于其他不需要双向绑定的成员，仍希望在代码中明确它单向发布通知的语义时，可以通过setter设置器的访问控制来达成。写全了是这样的：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span>@Published <span style="color:#66d9ef">internal</span> <span style="color:#66d9ef">private</span>(<span style="color:#66d9ef">set</span>) <span style="color:#66d9ef">var</span> counter = <span style="color:#ae81ff">0</span>
+</span></span></code></pre></div><p>其中<code>internal</code>可以和<code>private(set)</code>互换位置，当然也可以照常把<code>internal</code>省略以使用类型的总访问级别。
+这也还是不全，<code>counter = 0</code>被我们写的方法和无小数点的语境推断为<code>Int</code>，如果有位数的要求可以写明，并在plus方法中修改：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span>@Published <span style="color:#66d9ef">private</span>(<span style="color:#66d9ef">set</span>) <span style="color:#66d9ef">var</span> counter: Int64 = <span style="color:#ae81ff">0</span> <span style="color:#75715e">// 此处以64位为例</span>
+</span></span></code></pre></div><p>这个counter的类型就是所谓Model。
+一般来说，Model用struct结构体作为载体是比较灵活的，enum枚举体稍显死板却具备语义。实际上大部分Model都会写成struct，其中内嵌一层可解析JSON字段的enum。这里重点介绍enum枚举体的Model写法。
+在函数中，只依赖参数值、不依赖外部可变值的函数是<strong>纯函数</strong>。
+纯函数理念重视把可变的部分转移到函数体外部，保证在函数体中涉及的量都是可预测的，重视可靠性。尽管写程序总是需要可变的部分，不变的部分的保障对代码可靠性提升却不可忽视。
+在业务流程图中，总是会有节点面临不同的分支流向，它们往往会在某个节点折返，或者有着错综复杂的变化走向，这些分支流向就是<strong>业务状态</strong>。
+业务状态的抽象形式与enum枚举体相性很好，它们都接收一些固定的参数，都可以根据自身所在位置推断出某个结果。
+另外，ViewModel原则上不应当拥有子类，因此也应在class前添加<code>final</code>关键词，这还将使编译速度得到些许提高。
+试试写一个以enum枚举体为载体的Model，忽略进位，仅关注个位：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-Swift" data-lang="Swift"><span style="display:flex;"><span><span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">ImmutableModel</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> zero
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">case</span> increment(counter: Int)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">mutating</span> <span style="color:#66d9ef">func</span> <span style="color:#a6e22e">plus</span>(with number: Int) {
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 限定number是正整数</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">guard</span> number <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> <span style="color:#66d9ef">else</span> { <span style="color:#66d9ef">return</span> }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">let</span> rest = number <span style="color:#f92672">%</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">switch</span> <span style="color:#66d9ef">self</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> .zero:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">self</span> = .increment(counter: rest)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">case</span> .increment(counter: <span style="color:#66d9ef">let</span> counter):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">let</span> sumaryRest = (counter <span style="color:#f92672">+</span> rest) <span style="color:#f92672">%</span> <span style="color:#ae81ff">10</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> sumaryRest == <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">self</span> = .zero
+</span></span><span style="display:flex;"><span>            } <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">self</span> = .increment(counter: sumaryRest)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>其中.zero用例是初始状态，.increment用例是计数器不为0的状态，在plus方法中，计数器超过9时，跳转到zero状态。
+无论你的工程的业务状态有没有复杂到必须要引入enum来管理状态，你都需要在心中建立一个状态模型。边缘状态和最经常出现的状态同样重要。</p>
+<h1 id="总结">总结<a hidden class="anchor" aria-hidden="true" href="#总结">#</a></h1>
+<p>我们建立了一个小型工程，绘制了一个简单的视图并通过迭代使得它易于测试。为了易于测试，我们基于MVVM模式创建了ViewModel，并借助Combine响应式框架抽象、发布、更新视图状态。最后，我们引入了setter的访问级别、final class和纯函数理念，用于使代码明确封装的不可变性。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">WinterArch&#39;s WebLog</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>

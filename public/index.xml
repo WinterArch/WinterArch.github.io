@@ -1,19 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>WinterArch&#39;s site</title>
-    <link>http://localhost:1313/</link>
-    <description>Recent content on WinterArch&#39;s site</description>
+    <title>WinterArch&#39;s WebLog</title>
+    <link>https://winterarch.github.io/</link>
+    <description>Recent content on WinterArch&#39;s WebLog</description>
     <generator>Hugo -- 0.151.2</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 21 Oct 2025 14:58:51 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>HelloWorld</title>
-      <link>http://localhost:1313/posts/helloworld/</link>
-      <pubDate>Tue, 21 Oct 2025 14:58:51 +0800</pubDate>
-      <guid>http://localhost:1313/posts/helloworld/</guid>
-      <description>&lt;p&gt;#Hello, wrold!&lt;/p&gt;</description>
-    </item>
+    <lastBuildDate></lastBuildDate>
+    <atom:link href="https://winterarch.github.io/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>
