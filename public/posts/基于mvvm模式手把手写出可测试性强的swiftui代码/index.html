@@ -93,7 +93,7 @@ let package = Package(
   <meta property="og:description" content="用SwiftUI框架绘制视图 首先在Xcode里新建一个Swift Package包，要写UI库选择Library，git版本管理可以不勾，带SwiftTesting确保在Swift6的较新环境。 项目结构：
 ImmutableState ├── Package.swift ├── Sources │ └── ImmutableState │ └── ImmutableState.swift └── Tests └── ImmutableStateTests └── ImmutableStateTests.swift Package.swift（模板生成）：
 let package = Package( name: &#34;ImmutableState&#34;, products: [ // Products define the executables and libraries a package produces, making them visible to other packages. .library( name: &#34;ImmutableState&#34;, targets: [&#34;ImmutableState&#34;]), ], targets: [ // Targets are the basic building blocks of a package, defining a module or a test suite. // Targets can depend on other targets in this package and products from dependencies. .target( name: &#34;ImmutableState&#34;), .testTarget( name: &#34;ImmutableStateTests&#34;, dependencies: [&#34;ImmutableState&#34;] ), ] ) 上方展示了创建时的工程结构和模板生成Package.swift。 其次在ImmutableState.swift 旁边创建 ImmutableDemo 文件夹安放接下来的整套代码，也就在ImmutableDemo文件夹下使用 SwiftUIView 模板创建代码，然后右键struct的名称，refactor重构rename改名为 ImmutableView。">
-  <meta property="og:locale" content="en-us">
+  <meta property="og:locale" content="zh-CN">
   <meta property="og:type" content="article">
     <meta property="article:section" content="posts">
     <meta property="article:published_time" content="2025-10-21T15:43:57+08:00">
@@ -498,7 +498,22 @@ ImmutableView.swift标签页右方尽头，在倒数第2个按钮的多条横线
   <footer class="post-footer">
     <ul class="post-tags">
     </ul>
-  </footer>
+  </footer><script src="https://giscus.app/client.js"
+        data-repo="WinterArch/WinterArch.github.io"
+        data-repo-id="R_kgDONmR4Mg"
+        data-category-id="DIC_kwDONmR4Ms4Clvqg"
+        data-mapping="title"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+</script>
+
 </article>
     </main>
     
