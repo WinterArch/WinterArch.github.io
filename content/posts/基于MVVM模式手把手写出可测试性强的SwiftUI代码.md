@@ -1,6 +1,6 @@
 ---
 date: '2025-10-21T15:43:57+08:00'
-draft: true
+draft: false
 title: '基于MVVM模式手把手写出可测试性强的SwiftUI代码'
 ---
 # 用SwiftUI框架绘制视图

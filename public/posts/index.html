@@ -131,6 +131,34 @@
     Posts
   </h1>
 </header>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">基于MVVM模式手把手写出可测试性强的SwiftUI代码
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>用SwiftUI框架绘制视图 首先在Xcode里新建一个Swift Package包，要写UI库选择Library，git版本管理可以不勾，带SwiftTesting确保在Swift6的较新环境。 项目结构：
+ImmutableState ├── Package.swift ├── Sources │ └── ImmutableState │ └── ImmutableState.swift └── Tests └── ImmutableStateTests └── ImmutableStateTests.swift Package.swift（模板生成）：
+let package = Package( name: &#34;ImmutableState&#34;, products: [ // Products define the executables and libraries a package produces, making them visible to other packages. .library( name: &#34;ImmutableState&#34;, targets: [&#34;ImmutableState&#34;]), ], targets: [ // Targets are the basic building blocks of a package, defining a module or a test suite. // Targets can depend on other targets in this package and products from dependencies. .target( name: &#34;ImmutableState&#34;), .testTarget( name: &#34;ImmutableStateTests&#34;, dependencies: [&#34;ImmutableState&#34;] ), ] ) 上方展示了创建时的工程结构和模板生成Package.swift。 其次在ImmutableState.swift 旁边创建 ImmutableDemo 文件夹安放接下来的整套代码，也就在ImmutableDemo文件夹下使用 SwiftUIView 模板创建代码，然后右键struct的名称，refactor重构rename改名为 ImmutableView。
+...</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-10-21 15:43:57 +0800 CST'>October 21, 2025</span></footer>
+  <a class="entry-link" aria-label="post link to 基于MVVM模式手把手写出可测试性强的SwiftUI代码" href="https://winterarch.github.io/posts/%E5%9F%BA%E4%BA%8Emvvm%E6%A8%A1%E5%BC%8F%E6%89%8B%E6%8A%8A%E6%89%8B%E5%86%99%E5%87%BA%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%80%A7%E5%BC%BA%E7%9A%84swiftui%E4%BB%A3%E7%A0%81/"></a>
+</article>
+
+<article class="post-entry"> 
+  <header class="entry-header">
+    <h2 class="entry-hint-parent">HelloWorld
+    </h2>
+  </header>
+  <div class="entry-content">
+    <p>#Hello, wrold!
+</p>
+  </div>
+  <footer class="entry-footer"><span title='2025-10-21 14:58:51 +0800 CST'>October 21, 2025</span></footer>
+  <a class="entry-link" aria-label="post link to HelloWorld" href="https://winterarch.github.io/posts/helloworld/"></a>
+</article>
     </main>
     
 <footer class="footer">
