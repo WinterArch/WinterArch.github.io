@@ -2,5 +2,6 @@ baseURL: https://winterarch.github.io/
 languageCode: zh-CN
 params:
   comments: true
+  ShowCodeCopyButtons: true
 title: WinterArch's WebLog
 theme: ["PaperMod"]
