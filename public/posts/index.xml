@@ -6,8 +6,29 @@
     <description>Recent content in Posts on WinterArch&#39;s WebLog</description>
     <generator>Hugo -- 0.151.2</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 21 Oct 2025 15:43:57 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 27 Oct 2025 16:12:49 +0800</lastBuildDate>
     <atom:link href="https://winterarch.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>清除github幽灵通知 火狐浏览器</title>
+      <link>https://winterarch.github.io/posts/%E6%B8%85%E9%99%A4github%E5%B9%BD%E7%81%B5%E9%80%9A%E7%9F%A5-%E7%81%AB%E7%8B%90%E6%B5%8F%E8%A7%88%E5%99%A8/</link>
+      <pubDate>Mon, 27 Oct 2025 16:12:49 +0800</pubDate>
+      <guid>https://winterarch.github.io/posts/%E6%B8%85%E9%99%A4github%E5%B9%BD%E7%81%B5%E9%80%9A%E7%9F%A5-%E7%81%AB%E7%8B%90%E6%B5%8F%E8%A7%88%E5%99%A8/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/notifications&#34;&gt;Notifications&lt;/a&gt;这个网址里有某个仓库的通知无法被选中，
+于是搜索并&lt;a href=&#34;%E4%BB%8Ehttps://blog.sunlan.me/2025/10/13/%E6%B8%85%E9%99%A4GitHub%E5%B9%BD%E7%81%B5%E9%80%9A%E7%9F%A5/&#34;&gt;山风阁&lt;/a&gt;拿到了两行JavaScript，在FireFox上运行之后清掉了。
+文章中描述的是Chrome的用法，之前我因为Feedbro被禁用搬到FireFox，所以这里重点说明如何在FireFox里使用。
+把JavaScript片段贴到这里防止找不到：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-JavaScript&#34; data-lang=&#34;JavaScript&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;document.&lt;span style=&#34;color:#a6e22e&#34;&gt;querySelector&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;.js-notifications-mark-all-actions&amp;#39;&lt;/span&gt;).&lt;span style=&#34;color:#a6e22e&#34;&gt;removeAttribute&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;hidden&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;document.&lt;span style=&#34;color:#a6e22e&#34;&gt;querySelector&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;.js-notifications-mark-all-actions form[action=&amp;#34;/notifications/beta/archive&amp;#34;] button&amp;#39;&lt;/span&gt;).&lt;span style=&#34;color:#a6e22e&#34;&gt;removeAttribute&lt;/span&gt;(&lt;span style=&#34;color:#e6db74&#34;&gt;&amp;#39;disabled&amp;#39;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;ol&gt;
+&lt;li&gt;来到github的通知页面，在通知页面左侧，选中当前正在发送通知的幽灵仓库，这使得github的通知搜索栏里显示&lt;code&gt;repo:&lt;/code&gt;开头的标签&lt;/li&gt;
+&lt;li&gt;点击“全选”（Select all）&lt;/li&gt;
+&lt;li&gt;按F12打开或从“工具”选项打开“开发者工具”&lt;/li&gt;
+&lt;li&gt;点击控制台，按Ctrl+B（或Command+B）打开切换到多行模式&lt;/li&gt;
+&lt;li&gt;尝试点击左边的栏目并粘贴代码，输入&lt;code&gt;allow pasting&lt;/code&gt;确认粘贴代码&lt;/li&gt;
+&lt;li&gt;点击代码上方、控制台下方的运行按钮运行代码，这使得“全选”（Select all）之后的操作面板显示出来&lt;/li&gt;
+&lt;li&gt;点击Done，完成清除，等待刷新响应或手动刷新网页，该幽灵仓库应当不再产生通知圆点&lt;/li&gt;
+&lt;/ol&gt;</description>
+    </item>
     <item>
       <title>基于MVVM模式手把手写出可测试性强的SwiftUI代码</title>
       <link>https://winterarch.github.io/posts/%E5%9F%BA%E4%BA%8Emvvm%E6%A8%A1%E5%BC%8F%E6%89%8B%E6%8A%8A%E6%89%8B%E5%86%99%E5%87%BA%E5%8F%AF%E6%B5%8B%E8%AF%95%E6%80%A7%E5%BC%BA%E7%9A%84swiftui%E4%BB%A3%E7%A0%81/</link>
